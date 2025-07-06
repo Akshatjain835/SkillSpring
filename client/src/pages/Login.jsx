@@ -77,7 +77,7 @@ const Login = () => {
     await action(inputData);
   };
   return (
-    <div className="flex items-center justify-center w-full">
+    <div className="flex items-center justify-center w-full mt-20">
       <div className="flex w-full max-w-sm flex-col gap-6">
         <Tabs defaultValue="account">
           <TabsList>
@@ -137,7 +137,7 @@ const Login = () => {
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     </>
                   ) : (
-                    "Login"
+                    "Sign-Up"
                   )}
                 </Button>
               </CardFooter>

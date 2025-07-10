@@ -1,10 +1,10 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { userLoggedIn } from "../authSlice";
 
-const USER_API = "http://localhost:8080/api/v1/user/"
+const USER_API = "http://localhost:8080/api/v1/user/";
 
 export const authApi = createApi({
-  reducerPath: 'authApi',
+  reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
     baseUrl: USER_API,
     credentials: "include",
@@ -22,21 +22,23 @@ export const authApi = createApi({
         url: "login",
         method: "POST",
         body: inputData,
-        }),
-        async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-            try {
-                const result = await queryFulfilled;
-                dispatch(userLoggedIn({ user: result.data.user }));
-            } catch (error) {
-                console.log(error);
-                
-            }
+      }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(userLoggedIn({ user: result.data.user }));
+        } catch (error) {
+          console.log(error);
         }
+      },
     }),
+    loadUser: builder.query({
+      query: ()=>({
+        url: "profile",
+        method:"GET",
+      })
+    })
   }),
 });
 
-export const {
-    useRegisterUserMutation,
-    useLoginUserMutation,
-} = authApi
+export const { useRegisterUserMutation, useLoginUserMutation, useLoadUserQuery } = authApi;

@@ -61,7 +61,7 @@ const Login = () => {
     }
 
     if (registerError) {
-      toast.error(registerData.data.message || "Signup Failed");
+      toast.error(registerError.data.message || "Signup Failed");
     }
 
     if (loginIsSuccess && loginData) {
@@ -70,9 +70,16 @@ const Login = () => {
     }
 
     if (loginError) {
-      toast.error(loginData.data.message || "Login Failed");
+      toast.error(loginError.data.message || "Login Failed");
     }
-  }, [loginIsLoading, registerIsLoading, loginData, registerData]);
+  }, [
+    loginIsLoading,
+    registerIsLoading,
+    loginData,
+    loginError,
+    registerData,
+    registerError,
+  ]);
 
   const handleRegistration = async (type) => {
     const inputData = type === "signup" ? signupInput : loginInput;
@@ -82,7 +89,7 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center w-full mt-20">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <Tabs defaultValue="account">
+        <Tabs defaultValue="Login">
           <TabsList>
             <TabsTrigger value="Signup">Signup</TabsTrigger>
             <TabsTrigger value="Login">Login</TabsTrigger>
@@ -140,7 +147,7 @@ const Login = () => {
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     </>
                   ) : (
-                    "Sign-Up"
+                    "SignUp"
                   )}
                 </Button>
               </CardFooter>

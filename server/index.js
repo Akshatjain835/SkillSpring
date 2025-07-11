@@ -4,10 +4,12 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import connectDB from "./database/db.js";
 import userRoute from "./routes/user.route.js"
+import courseRoute from "./routes/course.route.js"
+
 dotenv.config({});
 
 // call database connection here
-connectDB()
+
 const app = express()
 
 const PORT = process.env.PORT || 3000;
@@ -20,11 +22,14 @@ app.use(cors({
     credentials: true
 }))
 
+connectDB();
+
+//api
+app.use("/api/v1/user", userRoute)
+app.use("/api/v1/course", courseRoute)
 
 app.listen(PORT, () => {
     console.log(`Server listen at port ${PORT}`); 
 })
 
 
-//api
-app.use("/api/v1/user", userRoute)

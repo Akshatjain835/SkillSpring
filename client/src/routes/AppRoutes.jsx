@@ -9,6 +9,7 @@ import Profile from "@/pages/student/Profile";
 import Dashboard from "@/pages/admin/Dashboard";
 import CourseTable from "@/pages/admin/course/CourseTable";
 import AddCourse from "@/pages/admin/course/AddCourse";
+import EditCourse from "@/pages/admin/course/EditCourse";
 
 
 export const appRoutes = [
@@ -54,6 +55,10 @@ export const appRoutes = [
             {
                 path:"course/create",
                 element:<AddCourse/>
+            },
+            {
+                path:"course/:courseId",
+                element:<EditCourse/>
             }
          ]
       }

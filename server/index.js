@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser"
 import connectDB from "./database/db.js";
 import userRoute from "./routes/user.route.js"
 import courseRoute from "./routes/course.route.js"
+import lectureRoute from "./routes/lecture.route.js"
+import mediaRoute from "./routes/media.route.js"
 
 dotenv.config({});
 
@@ -27,6 +29,8 @@ connectDB();
 //api
 app.use("/api/v1/user", userRoute)
 app.use("/api/v1/course", courseRoute)
+app.use("/api/v1/course", lectureRoute)
+app.use("/api/v1/media", mediaRoute)
 
 app.listen(PORT, () => {
     console.log(`Server listen at port ${PORT}`); 

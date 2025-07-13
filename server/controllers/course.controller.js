@@ -58,7 +58,7 @@ export const getCreatorCourses = async (req,res) => {
     }
 }
 
-export  const editCourseController = async (req,res) => {
+export  const editCourse = async (req,res) => {
 
     try {
         const courseId = req.params.courseId;
@@ -105,7 +105,7 @@ export  const editCourseController = async (req,res) => {
     }
 }
 
-export const getCourseByIdController = async (req,res) => {
+export const getCourseById = async (req,res) => {
 
     try {
         const {courseId} = req.params;
@@ -127,6 +127,6 @@ export const getCourseByIdController = async (req,res) => {
         return res.status(500).json({
             message:"Failed to get course by id"
         })
-        
+
     }
 }

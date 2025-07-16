@@ -7,7 +7,7 @@ import userRoute from "./routes/user.route.js"
 import courseRoute from "./routes/course.route.js"
 import lectureRoute from "./routes/lecture.route.js"
 import mediaRoute from "./routes/media.route.js"
-
+import purchaseRouter from "./routes/purchaseCourse.route.js"
 dotenv.config({});
 
 // call database connection here
@@ -31,7 +31,7 @@ app.use("/api/v1/user", userRoute)
 app.use("/api/v1/course", courseRoute)
 app.use("/api/v1/course", lectureRoute)
 app.use("/api/v1/media", mediaRoute)
-
+app.use("/api/v1/purchase", purchaseRouter);
 app.listen(PORT, () => {
     console.log(`Server listen at port ${PORT}`); 
 })

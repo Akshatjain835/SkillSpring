@@ -49,10 +49,10 @@ function Filter({ handleFilterChange }) {
       <div className="flex items-center justify-between">
         <h1 className="font-semibold text-lg md:text-xl">Filter Options</h1>
         <Select onValueChange={selectByPriceHandler}>
-          <SelectTrigger>
+          <SelectTrigger className="w-[160px] px-4 py-2 text-sm bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <SelectValue placeholder="Sort By" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-50" position="popper">
             <SelectGroup>
               <SelectLabel>Sort by prices</SelectLabel>
               <SelectItem value="low">Low to High</SelectItem>

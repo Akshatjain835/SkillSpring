@@ -14,6 +14,7 @@ import CreateLecture from "@/pages/admin/lecture/CreateLecture";
 import EditLecture from "@/pages/admin/lecture/EditLecture";
 import CourseDetail from "@/pages/student/CourseDetail";
 import CourseProgress from "@/pages/student/CourseProgress";
+import SearchPage from "@/pages/student/SearchPage";
 
 
 export const appRoutes = [
@@ -43,12 +44,16 @@ export const appRoutes = [
         element: <Profile />,
       },
       {
+        path: "course/search",
+        element: <SearchPage />,
+      },
+      {
         path: "course-detail/:courseId",
-        element: <CourseDetail/> ,
+        element: <CourseDetail />,
       },
       {
         path: "course-progress/:courseId",
-        element: <CourseProgress/> ,
+        element: <CourseProgress />,
       },
 
       //admin routes
@@ -58,19 +63,19 @@ export const appRoutes = [
         children: [
           {
             path: "dashboard",
-            element: <Dashboard />
+            element: <Dashboard />,
           },
           {
             path: "course",
-            element: <CourseTable />
+            element: <CourseTable />,
           },
           {
             path: "course/create",
-            element: <AddCourse />
+            element: <AddCourse />,
           },
           {
             path: "course/:courseId",
-            element: <EditCourse />
+            element: <EditCourse />,
           },
           {
             path: "course/:courseId/lecture",
@@ -80,8 +85,8 @@ export const appRoutes = [
             path: "course/:courseId/lecture/:lectureId",
             element: <EditLecture />,
           },
-        ]
-      }
+        ],
+      },
     ],
   },
 ];

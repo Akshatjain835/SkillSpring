@@ -30,7 +30,7 @@ import { useSelector } from "react-redux";
 function Navbar() {
   const { user } = useSelector((store) => store.auth);
   const [logoutUser, { data, isSuccess }] = useLogoutUserMutation();
-  const role = "instructor";
+  //const role = "instructor";
   const navigate = useNavigate();
 
   const logoutHandler = async () => {
@@ -76,13 +76,14 @@ function Navbar() {
                     <Link to="my-learning">My Learning</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link to="profile">Edit Profile</Link>
+                    {" "}
+                    <Link to="profile">Edit Profile</Link>{" "}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuItem onClick={logoutHandler}>
                   Log out
                 </DropdownMenuItem>
-                {user.role === "instructor" && (
+                {user?.role === "instructor" && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
@@ -94,14 +95,16 @@ function Navbar() {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button onClick={() => navigate("/login")}>Login / SignUp</Button>
+              <Button variant="outline" onClick={() => navigate("/login")}>
+                Login / SignUp
+              </Button>
             </div>
           )}
           <DarkMode />
         </div>
       </div>
       {/* Mobile Device */}
-      <div className="md:hidden items-center justify-between px-4 h-full">
+      <div className="flex md:hidden items-center justify-between px-4 h-full">
         <h1 className="font-extrabold text-2xl">E-Learning</h1>
         <Sheet>
           <SheetTrigger asChild>
@@ -115,19 +118,26 @@ function Navbar() {
           </SheetTrigger>
           <SheetContent className="flex flex-col ">
             <SheetHeader className="flex flex-row justify-between items-center mt-2">
-              <SheetTitle>E-Learning</SheetTitle>
+              <SheetTitle>
+                <Link to="/">E-Learning</Link>
+              </SheetTitle>
               <DarkMode />
             </SheetHeader>
             <Separator className="mr-2" />
             <nav className="flex flex-col space-y-4">
-              <span>My Learning</span>
-              <span>Edit Profile</span>
-              <span>Logout</span>
+              <Link to="/my-learning">My Learning</Link>
+              <Link to="/profile">Edit Profile</Link>
+              <p>Logout</p>
             </nav>
-            {role === "instructor" && (
+            {user?.role === "instructor" && (
               <SheetFooter>
                 <SheetClose asChild>
-                  <Button type="submit">Dashboard</Button>
+                  <Button
+                    type="submit"
+                    onClick={() => navigate(`/admin/dashboard`)}
+                  >
+                    Dashboard
+                  </Button>
                 </SheetClose>
               </SheetFooter>
             )}

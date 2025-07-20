@@ -44,7 +44,7 @@ function Navbar() {
     }
   }, [isSuccess]);
   return (
-    <div className="h-16 dark:bg-[#0A0A0A] bg-white border-b-gray-200 dark:border-b-gray-800 fixed top-0 left-0 right-0 duration-300 z-10">
+    <div className="h-16 dark:bg-[#020817] bg-white border-b dark:border-b-gray-800 fixed top-0 left-0 right-0 duration-300 z-10">
       {/* Desktop */}
       <div className="max-w-7xl mx-auto hidden justify-between items-center gap-10 h-full md:flex ">
         <div className="flex items-center gap-2">
@@ -107,7 +107,7 @@ function Navbar() {
           <SheetTrigger asChild>
             <Button
               size="icon"
-              className="rounded-full bg-gray-200 hover:bg-gray-300"
+              className="rounded-full hover:bg-gray-300"
               variant="outline"
             >
               <Menu />

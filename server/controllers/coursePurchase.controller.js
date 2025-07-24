@@ -12,12 +12,7 @@ export const createCheckoutSession = async (req, res) => {
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ message: "Course not found!" });
 
-    const newPurchase = new CoursePurchase({
-      courseId,
-      userId,
-      amount: course.coursePrice,
-      status: "pending",
-    });
+    
 
     const request = new paypal.orders.OrdersCreateRequest();
     request.prefer("return=representation");
@@ -50,6 +45,8 @@ export const createCheckoutSession = async (req, res) => {
       application_context: {
         return_url: `http://localhost:5173/course-progress/${courseId}`,
         cancel_url: `http://localhost:5173/course-detail/${courseId}?canceled=true`,
+        user_action: `PAY_NOW`,
+        brand_name: `SkillSpring`,
       },
     });
 
@@ -58,9 +55,15 @@ export const createCheckoutSession = async (req, res) => {
       (link) => link.rel === "approve"
     ).href;
 
+    const newPurchase = new CoursePurchase({
+      courseId,
+      userId,
+      amount: course.coursePrice,
+    });
+    newPurchase.status = "completed";
+
     newPurchase.paymentId = response.result.id;
     await newPurchase.save();
-    // console.log(newPurchase);
 
     return res.status(200).json({
       success: true,
@@ -90,9 +93,11 @@ export const captureOrder = async (req, res) => {
       return res.status(404).json({ message: "Purchase not found" });
     }
 
+
     purchase.status = "completed";
     purchase.payerId = payerID;
     await purchase.save();
+    
 
     // Enroll user, unlock lectures, etc.
     await Lecture.updateMany(

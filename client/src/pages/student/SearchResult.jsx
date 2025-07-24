@@ -21,7 +21,7 @@ const SearchResult = ({ course }) => {
           </h1>
           <p className="text-sm text-gray-600">{course?.subTitle}</p>
           <p className="text-sm text-gray-700">
-            Intructor:{" "}
+            Instructor:{" "}
             <span className="font-bold">{course?.creator?.name}</span>{" "}
           </p>
           <Badge className="w-fit mt-2 md:mt-0">{course?.courseLevel}</Badge>

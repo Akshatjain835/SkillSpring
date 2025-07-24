@@ -34,6 +34,8 @@ function CourseProgress() {
     const query = new URLSearchParams(location.search);
     const orderID = query.get("token");
     const payerID = query.get("PayerID");
+    console.log(orderID,"order")
+    console.log(payerID,"payer")
 
     if (orderID && payerID && courseId) {
       console.log("Capturing order:", { orderID, payerID, courseId });
@@ -116,7 +118,7 @@ function CourseProgress() {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Video section  */}
-        <div className="flex-1 md:w-3/5 h-fit rounded-lg shadow-lg p-4">
+        <div className="flex-1 md:w-3/5 h-344 rounded-lg shadow-lg p-4">
           <div>
             <video
               src={currentLecture?.videoUrl || initialLecture.videoUrl}

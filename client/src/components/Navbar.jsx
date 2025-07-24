@@ -72,12 +72,16 @@ function Navbar() {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  {user?.role === "student" && (
+                  <>
+                    <DropdownMenuItem>
                     <Link to="my-learning">My Learning</Link>
-                  </DropdownMenuItem>
+                    </DropdownMenuItem>
+                  </>
+                )}
                   <DropdownMenuItem>
-                    {" "}
-                    <Link to="profile">Edit Profile</Link>{" "}
+                    
+                    <Link to="profile">Edit Profile</Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuItem onClick={logoutHandler}>

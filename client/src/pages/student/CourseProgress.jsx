@@ -34,8 +34,6 @@ function CourseProgress() {
     const query = new URLSearchParams(location.search);
     const orderID = query.get("token");
     const payerID = query.get("PayerID");
-    console.log(orderID,"order")
-    console.log(payerID,"payer")
 
     if (orderID && payerID && courseId) {
       console.log("Capturing order:", { orderID, payerID, courseId });
@@ -96,6 +94,7 @@ function CourseProgress() {
   const handleInCompleteCourse = async () => {
     await inCompleteCourse(courseId);
   };
+  console.log(initialLecture.videoUrl, "viode");
 
   return (
     <div className="max-w-7xl mx-auto py-20">

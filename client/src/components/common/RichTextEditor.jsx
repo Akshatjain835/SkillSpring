@@ -54,11 +54,11 @@ const RichTextEditor = ({ input, setInput }) => {
   return (
     <div className="border border-gray-300 rounded-md">
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-1 p-2 bg-gray-50 border-b border-gray-300">
+      <div className="flex flex-wrap text-black gap-1 p-2 bg-gray-50 border-b border-gray-300">
         <button
           type="button"
           onClick={() => formatText('bold')}
-          className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-100"
+          className="px-3 py-1 text-sm bg-white  border border-gray-300 rounded hover:bg-gray-100"
           title="Bold"
         >
           <strong>B</strong>

@@ -21,7 +21,7 @@ const LectureTab = () => {
 
   const [btnDisable, setBtnDisable] = useState(true);
 
-  const [uploadVideInfo, setUploadVideoInfo] = useState(null);
+  const [uploadVideoInfo, setUploadVideoInfo] = useState(null);
   const [mediaProgress, setMediaProgress] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -84,7 +84,7 @@ const LectureTab = () => {
   const editLectureHandler = async () => {
     // console.log({ lectureTitle, uploadVideInfo, isFree, courseId, lectureId });
 
-    await edtiLecture({ lectureTitle, videoInfo: uploadVideInfo, isPreviewFree: isFree, courseId, lectureId, });
+    await edtiLecture({ lectureTitle, videoInfo: uploadVideoInfo, isPreviewFree: isFree, courseId, lectureId, });
 
 
   };
@@ -120,7 +120,7 @@ const LectureTab = () => {
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
-          <Button disbaled={removeLoading} variant="destructive" onClick={removeLectureHandler}>
+          <Button disabled={removeLoading} variant="destructive" onClick={removeLectureHandler}>
             {
               removeLoading ? <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

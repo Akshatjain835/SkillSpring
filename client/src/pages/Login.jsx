@@ -64,6 +64,7 @@ const Login = () => {
     if (registerError) {
       toast.error(registerError.data.message || "Signup Failed");
     }
+    // console.log(loginIsSuccess, "login")
 
     if (loginIsSuccess && loginData) {
       toast.success(loginData.message || "Login successfully.");

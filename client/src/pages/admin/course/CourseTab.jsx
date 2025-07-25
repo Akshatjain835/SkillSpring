@@ -1,17 +1,35 @@
-import RichTextEditor from '@/components/common/RichTextEditor'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useEditCourseMutation, useGetCourseByIdQuery, usePublishCourseMutation } from '@/features/api/courseApi'
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import RichTextEditor from "@/components/common/RichTextEditor";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  useDeleteCourseMutation,
+  useEditCourseMutation,
+  useGetCourseByIdQuery,
+  usePublishCourseMutation,
+} from "@/features/api/courseApi";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 const CourseTab = () => {
-
   const [input, setInput] = useState({
     courseTitle: "",
     subTitle: "",
@@ -25,14 +43,19 @@ const CourseTab = () => {
   const params = useParams();
   const courseId = params.courseId;
 
-  const { data: courseByIdData, isLoading: courseByIdLoading, refetch } = useGetCourseByIdQuery(courseId);
-
+  const {
+    data: courseByIdData,
+    isLoading: courseByIdLoading,
+    refetch,
+  } = useGetCourseByIdQuery(courseId);
+  const [deleteCourse, { isLoading: deleteLoading }] =
+    useDeleteCourseMutation();
   // const isLoading =false
   const [publishCourse, {}] = usePublishCourseMutation();
 
   useEffect(() => {
-    if (courseByIdData?.course) { 
-        const course = courseByIdData?.course;
+    if (courseByIdData?.course) {
+      const course = courseByIdData?.course;
       setInput({
         courseTitle: course.courseTitle,
         subTitle: course.subTitle,
@@ -46,7 +69,8 @@ const CourseTab = () => {
   }, [courseByIdData]);
 
   const [previewThumbnail, setPreviewThumbnail] = useState("");
-  const [editCourse, { data, isLoading, isSuccess, error }] = useEditCourseMutation();
+  const [editCourse, { data, isLoading, isSuccess, error }] =
+    useEditCourseMutation();
 
   const navigate = useNavigate();
 
@@ -54,42 +78,39 @@ const CourseTab = () => {
     const { name, value } = e.target;
     setInput({
       ...input,
-      [name]: value
+      [name]: value,
     });
   };
 
   const selectCategory = (value) => {
     setInput({
       ...input,
-      category: value
+      category: value,
     });
   };
 
   const selectCourseLevel = (value) => {
     setInput({
       ...input,
-      courseLevel: value
+      courseLevel: value,
     });
   };
 
-    // get file
-    const selectThumbnail = (e) => {
+  // get file
+  const selectThumbnail = (e) => {
+    const file = e.target.files?.[0];
 
-      const file = e.target.files?.[0];
-
-      if (file) {
-
-        setInput({ ...input, courseThumbnail: file });
-        const fileReader = new FileReader();
-        fileReader.onloadend = () => setPreviewThumbnail(fileReader.result);
-        fileReader.readAsDataURL(file);
-      }
-    };
+    if (file) {
+      setInput({ ...input, courseThumbnail: file });
+      const fileReader = new FileReader();
+      fileReader.onloadend = () => setPreviewThumbnail(fileReader.result);
+      fileReader.readAsDataURL(file);
+    }
+  };
 
   const isPublished = false;
 
   const updateCourseHandler = async () => {
-
     const formData = new FormData();
     formData.append("courseTitle", input.courseTitle);
     formData.append("subTitle", input.subTitle);
@@ -100,20 +121,30 @@ const CourseTab = () => {
     formData.append("courseThumbnail", input.courseThumbnail);
 
     await editCourse({ formData, courseId });
-
   };
 
   const publishStatusHandler = async (action) => {
     try {
-      const response = await publishCourse({courseId, query:action});
-      if(response.data){
+      const response = await publishCourse({ courseId, query: action });
+      if (response.data) {
         refetch();
         toast.success(response.data.message);
       }
     } catch (error) {
       toast.error("Failed to publish or unpublish course");
     }
-  }
+  };
+  const removeCourseHandler = async () => {
+    if (!window.confirm("Are you sure you want to delete this course?")) return;
+
+    try {
+      const res = await deleteCourse(courseId).unwrap();
+      toast.success(res.message || "Course deleted successfully.");
+      navigate("/admin/course");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to delete course");
+    }
+  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -124,8 +155,8 @@ const CourseTab = () => {
     }
   }, [isSuccess, error]);
 
-  if(courseByIdLoading){
-    return <h1>Loading...</h1>
+  if (courseByIdLoading) {
+    return <h1>Loading...</h1>;
   }
 
   return (
@@ -138,10 +169,24 @@ const CourseTab = () => {
           </CardDescription>
         </div>
         <div className="space-x-2">
-          <Button disabled={courseByIdData?.course.lectures.length === 0} variant="outline" onClick={() => publishStatusHandler(courseByIdData?.course.isPublished ? "false" : "true")}>
+          <Button
+            disabled={courseByIdData?.course.lectures.length === 0}
+            variant="outline"
+            onClick={() =>
+              publishStatusHandler(
+                courseByIdData?.course.isPublished ? "false" : "true"
+              )
+            }
+          >
             {courseByIdData?.course.isPublished ? "Unpublished" : "Publish"}
           </Button>
-          <Button>Remove Course</Button>
+          <Button
+            disabled={deleteLoading}
+            onClick={removeCourseHandler}
+            variant="destructive"
+          >
+            {deleteLoading ? "Removing..." : "Remove Course"}
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -268,7 +313,7 @@ const CourseTab = () => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default CourseTab
+export default CourseTab;

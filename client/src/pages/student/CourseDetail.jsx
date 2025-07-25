@@ -9,7 +9,6 @@ import { BadgeInfo } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { PlayCircle } from "lucide-react";
 import { Lock } from "lucide-react";
-import ReactPlayer from "react-player";
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -58,6 +57,7 @@ const CourseDetail = () => {
       navigate(`/course-progress/${courseId}`);
     }
   };
+  console.log(course, "co")
 
   return (
     <div className="space-y-5">
@@ -96,7 +96,7 @@ const CourseDetail = () => {
               {course.lectures.map((lecture, idx) => (
                 <div key={idx} className="flex items-center gap-3 text-sm">
                   <span>
-                    {true ? <PlayCircle size={14} /> : <Lock size={14} />}
+                    {(lecture.isPreviewFree || purchased) ? <PlayCircle size={14} /> : <Lock size={14} />}
                   </span>
                   <p>{lecture.lectureTitle}</p>
                 </div>
@@ -108,16 +108,17 @@ const CourseDetail = () => {
           <Card>
             <CardContent className="p-4 flex flex-col">
               <div className="w-full aspect-video mb-4">
-                <ReactPlayer
+                <video
+                  src={course.lectures[0].videoUrl}
+                  controls
+                  autoPlay
                   width="100%"
                   height="100%"
-                  url={course.lectures[0].videoUrl}
-                  controls={true}
-                />
+                ></video>
               </div>
-              <h1>Lecture title</h1>
+              <h1>{course.lectures[0].lectureTitle}</h1>
               <Separator className="my-2" />
-              <h1 className="text-lg md:text-xl font-semibold">Course Price</h1>
+              <h1 className="text-lg md:text-xl text-center font-semibold">${course.coursePrice}</h1>
             </CardContent>
             <CardFooter className="flex justify-center p-4">
               {purchased ? (

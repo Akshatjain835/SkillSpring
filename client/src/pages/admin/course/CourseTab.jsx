@@ -268,7 +268,7 @@ const CourseTab = () => {
               </Select>
             </div>
             <div>
-              <Label>Price in (INR)</Label>
+              <Label>Price in (USD)</Label>
               <Input
                 type="number"
                 name="coursePrice"

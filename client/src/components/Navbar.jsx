@@ -74,14 +74,13 @@ function Navbar() {
                 <DropdownMenuGroup>
                   {user?.role === "student" && (
                   <>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                     <Link to="my-learning">My Learning</Link>
                     </DropdownMenuItem>
                   </>
                 )}
-                  <DropdownMenuItem>
-                    
-                    <Link to="profile">Edit Profile</Link>
+                  <DropdownMenuItem asChild>
+                    <Link to="profile">Profile</Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuItem onClick={logoutHandler}>

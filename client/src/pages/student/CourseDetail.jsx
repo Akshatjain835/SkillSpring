@@ -57,7 +57,6 @@ const CourseDetail = () => {
       navigate(`/course-progress/${courseId}`);
     }
   };
-  console.log(course, "co")
 
   return (
     <div className="space-y-5">

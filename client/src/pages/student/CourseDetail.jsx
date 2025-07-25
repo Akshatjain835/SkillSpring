@@ -57,6 +57,7 @@ const CourseDetail = () => {
       navigate(`/course-progress/${courseId}`);
     }
   };
+  console.log(course, "cj")
 
   return (
     <div className="space-y-5">
@@ -65,7 +66,7 @@ const CourseDetail = () => {
           <h1 className="font-bold pt-10 text-2xl md:text-3xl">
             {course?.courseTitle}
           </h1>
-          <p className="text-base md:text-lg">Course Sub-title</p>
+          <p className="text-base md:text-lg">{course?.subTitle}</p>
           <p>
             Created By{" "}
             <span className="text-[#C0C4FC] underline italic">

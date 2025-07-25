@@ -113,7 +113,7 @@ const CreateLecture = () => {
       </div>
       <div className="space-y-4">
         <div>
-          <Label>Title</Label>
+          <Label>Lecture Title</Label>
           <Input
             type="text"
             value={lectureTitle}
@@ -122,7 +122,7 @@ const CreateLecture = () => {
           />
         </div>
         <div>
-          <Label>Upload Video</Label>
+          <Label>Upload Video Lecture</Label>
           <Input type="file" accept="video/*" onChange={fileChangeHandler} />
         </div>
         <div className="flex items-center space-x-2">

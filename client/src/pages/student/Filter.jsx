@@ -28,13 +28,13 @@ const categories = [
 function Filter({ handleFilterChange }) {
   const [selectedCategories, setSelectedCatgories] = useState([]);
   const [sortByPrice, setSortByPrice] = useState("");
-  const handleCategoryChange = (categoryId) => {
+  const handleCategoryChange = (getcategory) => {
     setSelectedCatgories((prevCategories) => {
-      const newCategories = prevCategories.includes(categoryId)
-        ? prevCategories.filter((id) => id !== categoryId)
-            : [...prevCategories, categoryId];
+      const newCategories = prevCategories.includes(getcategory)
+        ? prevCategories.filter((category) => category !== getcategory)
+        : [...prevCategories, getcategory];
         
-        handleCategoryChange(newCategories, sortByPrice)
+        handleFilterChange(newCategories, sortByPrice);
         return newCategories
     });
     };
@@ -65,10 +65,10 @@ function Filter({ handleFilterChange }) {
       <div>
         <h1 className="font-semibold mb-2">CATEGORY</h1>
         {categories.map((category) => (
-          <div className="flex items-center space-x-2 my-2">
+          <div key={category.id} className="flex items-center space-x-2 my-2">
             <Checkbox
               id={category.id}
-              onCheckedChange={() => handleCategoryChange(category.id)}
+              onCheckedChange={() => handleCategoryChange(category.label)}
             />
             <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               {category.label}

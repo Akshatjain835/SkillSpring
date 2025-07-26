@@ -54,40 +54,24 @@ const Login = () => {
       setLoginInput({ ...loginInput, [name]: value });
     }
   };
-
-  useEffect(() => {
-    if (registerIsSuccess && registerData) {
-      toast.success(registerData.message || "Signup successfully.");
-      navigate("/login");
-    }
-
-    if (registerError) {
-      toast.error(registerError.data.message || "Signup Failed");
-    }
-    // console.log(loginIsSuccess, "login")
-
-    if (loginIsSuccess && loginData) {
-      toast.success(loginData.message || "Login successfully.");
-      navigate("/");
-    }
-
-    if (loginError) {
-      toast.error(loginError.data.message || "Login Failed");
-    }
-  }, [
-    loginIsLoading,
-    registerIsLoading,
-    loginData,
-    loginError,
-    registerData,
-    registerError,
-  ]);
-
   const handleRegistration = async (type) => {
     const inputData = type === "signup" ? signupInput : loginInput;
     const action = type === "signup" ? registerUser : loginUser;
-    await action(inputData);
+    try {
+    const response = await action(inputData).unwrap();
+    toast.success(response.message || `${type} success`);
+
+    if (type === "signup") {
+      navigate("/login");
+    } else {
+      navigate("/");
+    }
+  } catch (err) {
+    toast.error(err?.data?.message || `${type} failed`);
+  }
   };
+
+
   return (
     <div className="flex items-center justify-center w-full mt-20">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -144,7 +128,7 @@ const Login = () => {
                   disabled={registerIsLoading}
                   onClick={() => handleRegistration("signup")}
                 >
-                  {loginIsLoading ? (
+                  {registerIsLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     </>
@@ -193,9 +177,7 @@ const Login = () => {
                   onClick={() => handleRegistration("login")}
                 >
                   {loginIsLoading ? (
-                    <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    </>
                   ) : (
                     "Login"
                   )}

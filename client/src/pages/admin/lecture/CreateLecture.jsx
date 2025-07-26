@@ -12,7 +12,7 @@ import { Loader2 } from "lucide-react";
 import Lecture from "./Lecture";
 import axios from "axios";
 
-const MEDIA_API = "http://localhost:8080/api/v1/media";
+const MEDIA_API = `${import.meta.env.VITE_API_URL}/api/v1/media`;
 
 const CreateLecture = () => {
   const [uploading, setUploading] = useState(false);

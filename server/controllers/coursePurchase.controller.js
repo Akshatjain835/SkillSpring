@@ -43,8 +43,8 @@ export const createCheckoutSession = async (req, res) => {
         },
       ],
       application_context: {
-        return_url: `http://localhost:5173/course-progress/${courseId}`,
-        cancel_url: `http://localhost:5173/course-detail/${courseId}?canceled=true`,
+        return_url: `${process.env.CLIENT_URL}/course-progress/${courseId}`,
+        cancel_url: `${process.env.CLIENT_URL}/course-detail/${courseId}?canceled=true`,
         user_action: `PAY_NOW`,
         brand_name: `SkillSpring`,
       },

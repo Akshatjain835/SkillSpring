@@ -33,7 +33,7 @@ connectDB();
 //api
 app.use("/api/v1/user", userRoute)
 app.use("/api/v1/course", courseRoute)
-app.use("/api/v1/lecture", lectureRoute)
+app.use("/api/v1/course", lectureRoute)
 app.use("/api/v1/media", mediaRoute)
 app.use("/api/v1/purchase", purchaseRouter);
 app.use("/api/v1/progress", courseProgressRoute);

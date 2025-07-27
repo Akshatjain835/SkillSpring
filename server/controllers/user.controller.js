@@ -78,10 +78,17 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    return res.status(200).cookie("token", "", { maxAge: 0 }).json({
-      success: true,
-      message: "Logged out successfully",
-    });
+    return res
+      .status(200)
+      .clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", 
+        sameSite: "strict",
+      })
+      .json({
+        success: true,
+        message: "Logged out successfully",
+      });
   } catch (error) {
     console.log(error);
 
@@ -91,6 +98,7 @@ export const logout = async (req, res) => {
     });
   }
 };
+
 
 export const getUserProfile = async (req, res) => {
   try {

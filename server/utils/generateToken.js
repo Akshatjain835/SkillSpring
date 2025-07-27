@@ -9,7 +9,7 @@ export const generateToken = (res, user, message) => {
     .cookie("token", token, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "None",
       maxAge: 1 * 60 * 60 * 1000,
     })
     .json({

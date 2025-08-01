@@ -11,11 +11,12 @@ export const generateToken = (res, user, message) => {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      maxAge: 1 * 60 * 60 * 1000, 
+      maxAge: 24 * 60 * 60 * 1000, 
     })
     .json({
       success: true,
       message,
+      token,
       user,
     });
 };

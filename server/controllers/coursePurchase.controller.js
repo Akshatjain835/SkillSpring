@@ -187,3 +187,4 @@ export const getAllPurchasedCourse = async (_, res) => {
     console.log(error);
   }
 };
+

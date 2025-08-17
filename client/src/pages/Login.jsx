@@ -1,4 +1,4 @@
-import { AppWindowIcon, CodeIcon, Loader, Loader2 } from "lucide-react";
+import { AppWindowIcon, CodeIcon, Loader, Loader2, TruckElectric } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -97,7 +97,7 @@ const Login = () => {
                     value={signupInput.name}
                     onChange={(e) => changeInputHnadler(e, "signup")}
                     placeholder="Enter your name"
-                    required="true"
+                    required={true}
                   />
                 </div>
                 <div className="grid gap-3">
@@ -108,7 +108,7 @@ const Login = () => {
                     value={signupInput.email}
                     onChange={(e) => changeInputHnadler(e, "signup")}
                     placeholder="Enter your email"
-                    required="true"
+                    required={true}
                   />
                 </div>
                 <div className="grid gap-3">
@@ -119,7 +119,7 @@ const Login = () => {
                     value={signupInput.password}
                     onChange={(e) => changeInputHnadler(e, "signup")}
                     placeholder="Enter your password"
-                    required="true"
+                    required={true}
                   />
                 </div>
               </CardContent>
@@ -156,7 +156,7 @@ const Login = () => {
                     value={loginInput.email}
                     onChange={(e) => changeInputHnadler(e, "login")}
                     placeholder="Enter your email"
-                    required="true"
+                    required={true}
                   />
                 </div>
                 <div className="grid gap-3">
@@ -167,7 +167,7 @@ const Login = () => {
                     value={loginInput.password}
                     onChange={(e) => changeInputHnadler(e, "login")}
                     placeholder="Enter your password"
-                    required="true"
+                    required={true}
                   />
                 </div>
               </CardContent>

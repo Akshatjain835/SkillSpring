@@ -19,7 +19,7 @@ const SearchPage = () => {
     sortByPrice,
   });
 
-  const isEmpty = !isLoading && data?.courses.length === 0;
+  const isEmpty = !isLoading && data?.courses?.length === 0;
 
   const handleFilterChange = (categories, price) => {
     setSelectedCatgories(categories);

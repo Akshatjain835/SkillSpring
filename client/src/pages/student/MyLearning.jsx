@@ -3,12 +3,12 @@ import Course from "./Course";
 import { useLoadUserQuery } from "@/features/api/authApi";
 
 function MyLearning() {
-  // const isLoading = false;
-  
-  const {data, isLoading} = useLoadUserQuery();
+  const { data, isLoading, refetch } = useLoadUserQuery();
+  const myLearning = data?.user?.enrolledCourses || [];
 
-  // const myLearning = [];
-  const myLearning = data?.user.enrolledCourses || [];
+  React.useEffect(() => {
+    refetch();
+  }, [refetch]);
   return (
     <div className="max-w-4xl mx-auto my-10 px-4 md:px-0">
       <h1 className="font-bold text-2xl ">MY LEARNING</h1>

@@ -4,15 +4,17 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-      "dev": "nodemon index.js",  
-  "start": "node index.js",    
-  "build": "npm install"  
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "build": "npm install"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@langchain/google-genai": "^2.2.0",
+    "@langchain/langgraph": "^1.4.8",
     "@paypal/checkout-server-sdk": "^1.0.3",
     "@paypal/paypal-server-sdk": "^1.1.0",
     "bcryptjs": "^3.0.2",

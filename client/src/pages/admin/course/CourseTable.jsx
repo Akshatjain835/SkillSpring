@@ -77,7 +77,7 @@ const CourseTable = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-         {data?.courses?.map((course) => (
+         {Array.isArray(data?.courses) && data?.courses?.map((course) => (
             <TableRow key={course._id}>
               <TableCell className="font-medium">${course?.coursePrice || "NA"}</TableCell>
               <TableCell> <Badge>{course.isPublished ? "Published" : "Draft"}</Badge> </TableCell>

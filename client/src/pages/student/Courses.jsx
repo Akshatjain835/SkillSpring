@@ -18,7 +18,7 @@ function Courses() {
               <CourseSkeleton key={index} />
             ))
           ) : (
-           data?.courses && data.courses.map((course, index) => <Course key={index} course={course}/>) 
+            data?.courses && data.courses.map((course, index) => <Course key={index} course={course}/>) 
           )}
         </div>
       </div>

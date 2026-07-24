@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import QuizPlayer from "@/components/QuizPlayer";
 import {
   useCompleteCourseMutation,
   useGetCourseProgressQuery,
@@ -73,6 +74,7 @@ function CourseProgress() {
   // initialze the first lecture is not exist
   const initialLecture =
     currentLecture || (courseDetails.lectures && courseDetails.lectures[0]);
+  const activeLectureId = currentLecture?._id || initialLecture?._id;
 
   const isLectureCompleted = (lectureId) => {
     return progress.some((prog) => prog.lectureId === lectureId && prog.viewed);
@@ -141,6 +143,12 @@ function CourseProgress() {
               }`}
             </h3>
           </div>
+
+          {activeLectureId && (
+            <div className="mt-4">
+              <QuizPlayer courseId={courseId} lectureId={activeLectureId} />
+            </div>
+          )}
         </div>
         {/* Lecture Sidebar  */}
         <div className="flex flex-col w-full md:w-2/5 border-t md:border-t-0 md:border-l border-gray-200 md:pl-4 pt-4 md:pt-0">

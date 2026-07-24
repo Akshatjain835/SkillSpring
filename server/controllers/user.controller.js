@@ -112,9 +112,14 @@ export const getUserProfile = async (req, res) => {
         message: "Profile not found",
       });
     }
+    const enrolledCourses = user.enrolledCourses || [];
+
     return res.status(200).json({
       success: true,
-      user,
+      user: {
+        ...user.toObject(),
+        enrolledCourses,
+      },
     });
   } catch (error) {
     console.log(error);

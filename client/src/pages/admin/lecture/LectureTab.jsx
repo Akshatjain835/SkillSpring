@@ -14,6 +14,8 @@ import {
   useGetLectureByIdQuery,
   useRemoveLectureMutation,
 } from "@/features/api/lectureApi";
+import { useProcessLectureTranscriptMutation } from "@/features/api/tutorApi";
+import { useGenerateQuizMutation } from "@/features/api/quizApi";
 import { useNavigate, useParams } from "react-router-dom";
 
 const MEDIA_API = `${import.meta.env.VITE_API_URL}/api/v1/media`;
@@ -51,6 +53,42 @@ const LectureTab = () => {
     removeLecture,
     { data: removeData, isLoading: removeLoading, isSuccess: removeSuccess },
   ] = useRemoveLectureMutation();
+
+  const [processTranscript, { isLoading: isProcessingTranscript }] =
+    useProcessLectureTranscriptMutation();
+
+  const processTranscriptHandler = async () => {
+    try {
+      const res = await processTranscript({ courseId, lectureId }).unwrap();
+      toast.success(
+        `Indexed ${res.chunkCount} transcript chunks — the AI tutor can now use this lecture.`
+      );
+    } catch (err) {
+      toast.error(
+        err?.data?.message || "Failed to process transcript for AI tutor"
+      );
+    }
+  };
+
+  const [generateQuiz, { isLoading: isGeneratingQuiz }] =
+    useGenerateQuizMutation();
+
+  const generateQuizHandler = async () => {
+    try {
+      const res = await generateQuiz({
+        courseId,
+        lectureId,
+        numQuestions: 5,
+      }).unwrap();
+      toast.success(
+        res.passedCritique
+          ? "Quiz generated and passed self-review."
+          : `Quiz generated after ${res.retriesUsed} correction pass(es).`
+      );
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to generate quiz");
+    }
+  };
 
   const fileChangeHandler = async (e) => {
     try {
@@ -176,7 +214,7 @@ const LectureTab = () => {
         </div>
 
 
-        <div className="mt-4">
+        <div className="mt-4 flex items-center gap-2">
           <Button
             disabled={isLoading || !uploadVideoInfo?.videoUrl}
             onClick={editLectureHandler}
@@ -188,6 +226,37 @@ const LectureTab = () => {
               </>
             ) : (
               "Update Lecture"
+            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            disabled={isProcessingTranscript || !lecture?.videoUrl}
+            onClick={processTranscriptHandler}
+          >
+            {isProcessingTranscript ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Indexing...
+              </>
+            ) : (
+              "Process for AI Tutor"
+            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            disabled={isGeneratingQuiz || !lecture?.videoUrl}
+            onClick={generateQuizHandler}
+            title='Requires "Process for AI Tutor" to have run first'
+          >
+            {isGeneratingQuiz ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              "Generate Quiz"
             )}
           </Button>
         </div>

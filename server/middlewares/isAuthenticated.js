@@ -7,7 +7,7 @@ const isAuthenticated = (req, res, next) => {
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: "User not authenticated!",
+        message: "User not authenticated! AKSHAT",
       });
     }
 
@@ -22,8 +22,9 @@ const isAuthenticated = (req, res, next) => {
 
     req.id = decoded.userId;
     next();
+
   } catch (error) {
-    console.error("Authentication error:", error.message);
+    console.error("Authentication error AKSHAT :", error.message);
     return res.status(401).json({
       success: false,
       message: "Authentication failed. Invalid or expired token.",

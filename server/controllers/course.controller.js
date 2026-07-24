@@ -3,7 +3,7 @@ import { deleteMediaFromCloudinary, uploadMedia } from "../utils/cloudinary.js";
 
 export const createCourse = async (req,res) => {
     try {
-     
+    
         
         const {courseTitle, category} = req.body;
 
@@ -178,7 +178,7 @@ export const searchCourse = async (req, res) => {
     }
 
     let courses = [];
-
+    
     if (query?.trim()) {
       const queryCriteria = {
         isPublished: true,

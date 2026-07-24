@@ -57,12 +57,12 @@ const CourseTab = () => {
     if (courseByIdData?.course) {
       const course = courseByIdData?.course;
       setInput({
-        courseTitle: course.courseTitle,
-        subTitle: course.subTitle,
-        description: course.description,
-        category: course.category,
-        courseLevel: course.courseLevel,
-        coursePrice: course.coursePrice,
+        courseTitle: course.courseTitle ?? "",
+        subTitle: course.subTitle ?? "",
+        description: course.description ?? "",
+        category: course.category ?? "",
+        courseLevel: course.courseLevel ?? "",
+        coursePrice: course.coursePrice ?? "",
         courseThumbnail: "",
       });
     }
@@ -219,7 +219,7 @@ const CourseTab = () => {
             <div>
               <Label>Category</Label>
               <Select
-                defaultValue={input.category}
+                value={input.category}
                 onValueChange={selectCategory}
               >
                 <SelectTrigger className="w-[180px]">
@@ -251,7 +251,7 @@ const CourseTab = () => {
             <div>
               <Label>Course Level</Label>
               <Select
-                defaultValue={input.courseLevel}
+                value={input.courseLevel}
                 onValueChange={selectCourseLevel}
               >
                 <SelectTrigger className="w-[180px]">

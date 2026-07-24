@@ -1,4 +1,5 @@
 import { paypal, client } from "../helpers/paypal.js";
+import { normalizeCheckoutAmount, getApprovalLink } from "../helpers/checkout.js";
 import { Course } from "../models/course.model.js";
 import { CoursePurchase } from "../models/coursePurchase.model.js";
 import { Lecture } from "../models/Lecture.model.js";
@@ -9,10 +10,20 @@ export const createCheckoutSession = async (req, res) => {
     const userId = req.id;
     const { courseId } = req.body;
 
+    if (!courseId) {
+      return res.status(400).json({ success: false, message: "Course ID is required." });
+    }
+
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ message: "Course not found!" });
 
-    
+    const amount = normalizeCheckoutAmount(course.coursePrice);
+    if (amount === null) {
+      return res.status(400).json({
+        success: false,
+        message: "This course does not have a valid price configured for checkout.",
+      });
+    }
 
     const request = new paypal.orders.OrdersCreateRequest();
     request.prefer("return=representation");
@@ -22,11 +33,11 @@ export const createCheckoutSession = async (req, res) => {
         {
           amount: {
             currency_code: "USD",
-            value: course.coursePrice.toFixed(2),
+            value: amount.toFixed(2),
             breakdown: {
               item_total: {
                 currency_code: "USD",
-                value: course.coursePrice.toFixed(2),
+                value: amount.toFixed(2),
               },
             },
           },
@@ -35,7 +46,7 @@ export const createCheckoutSession = async (req, res) => {
               name: course.courseTitle,
               unit_amount: {
                 currency_code: "USD",
-                value: course.coursePrice.toFixed(2),
+                value: amount.toFixed(2),
               },
               quantity: "1",
             },
@@ -43,22 +54,27 @@ export const createCheckoutSession = async (req, res) => {
         },
       ],
       application_context: {
-        return_url: `${process.env.CLIENT_URL}/course-progress/${courseId}`,
-        cancel_url: `${process.env.CLIENT_URL}/course-detail/${courseId}?canceled=true`,
-        user_action: `PAY_NOW`,
-        brand_name: `SkillSpring`,
+        return_url: `${process.env.CLIENT_URL || "http://localhost:5173"}/course-progress/${courseId}`,
+        cancel_url: `${process.env.CLIENT_URL || "http://localhost:5173"}/course-detail/${courseId}?canceled=true`,
+        user_action: "PAY_NOW",
+        brand_name: "SkillSpring",
       },
     });
 
     const response = await client().execute(request);
-    const approvalURL = response.result.links.find(
-      (link) => link.rel === "approve"
-    ).href;
+    const approvalURL = getApprovalLink(response);
+
+    if (!approvalURL) {
+      return res.status(502).json({
+        success: false,
+        message: "PayPal did not return an approval URL for this checkout session.",
+      });
+    }
 
     const newPurchase = new CoursePurchase({
       courseId,
       userId,
-      amount: course.coursePrice,
+      amount,
     });
     newPurchase.status = "completed";
 
@@ -73,7 +89,7 @@ export const createCheckoutSession = async (req, res) => {
     console.error("PayPal Checkout Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error during PayPal checkout",
+      message: error?.message || "Internal server error during PayPal checkout",
     });
   }
 };
@@ -107,7 +123,7 @@ export const captureOrder = async (req, res) => {
 
     await User.findByIdAndUpdate(userId, {
       $addToSet: { enrolledCourses: courseId },
-    });
+    }, { new: true });
 
     await Course.findByIdAndUpdate(courseId, {
       $addToSet: { enrolledStudents: userId },

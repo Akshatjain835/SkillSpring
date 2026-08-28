@@ -31,12 +31,41 @@ const QuizGenState = Annotation.Root({
 
 // ---- helpers -----------------------------------------------------------
 
+function extractText(content) {
+  if (!content) return "";
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    return content.map((c) => (typeof c === "string" ? c : c?.text || "")).join("");
+  }
+  return content.toString?.() || "";
+}
+
+function sanitizeQuestions(questions) {
+  if (!Array.isArray(questions)) return [];
+  return questions
+    .filter((q) => q && typeof q.questionText === "string" && q.questionText.trim())
+    .map((q) => {
+      const type = q.type === "mcq" ? "mcq" : "short_answer";
+      const options = type === "mcq" && Array.isArray(q.options) ? q.options.map(String) : [];
+      return {
+        questionText: q.questionText.trim(),
+        type,
+        options,
+        correctAnswer: (q.correctAnswer || "").toString().trim(),
+        sourceExcerpt: (q.sourceExcerpt || "").toString().trim(),
+      };
+    });
+}
+
 /** Strips ```json fences etc. and parses. Returns null on failure. */
-function safeParseJsonArray(raw) {
+export function safeParseJsonArray(raw) {
+  if (!raw) return null;
+  const str = extractText(raw);
   try {
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(cleaned);
-    return Array.isArray(parsed) ? parsed : null;
+    const jsonMatch = str.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) return null;
+    const parsed = JSON.parse(jsonMatch[0]);
+    return Array.isArray(parsed) ? sanitizeQuestions(parsed) : null;
   } catch {
     return null;
   }
@@ -65,16 +94,17 @@ export function isQuotaError(error) {
 }
 
 export function buildFallbackQuestions({ lectureTitle, transcriptContext, numQuestions = 5 }) {
-  const sentences = transcriptContext
+  const safeTranscript = transcriptContext || `Lecture on ${lectureTitle}`;
+  const sentences = safeTranscript
     .split(/\n+/)
     .map((line) => line.trim())
     .filter(Boolean);
 
-  const seedFacts = sentences.slice(0, 6);
+  const seedFacts = sentences.length > 0 ? sentences.slice(0, 6) : [`Lecture topic: ${lectureTitle}`];
   const fallbackQuestions = [];
 
   for (let i = 0; i < Math.max(1, numQuestions); i += 1) {
-    const source = seedFacts[i % seedFacts.length] || transcriptContext;
+    const source = seedFacts[i % seedFacts.length] || safeTranscript;
     const lowerSource = source.toLowerCase();
 
     let questionText = "Summarize the main point of this lecture.";
@@ -98,12 +128,13 @@ export function buildFallbackQuestions({ lectureTitle, transcriptContext, numQue
     fallbackQuestions.push({
       questionText,
       type,
+      options: [],
       correctAnswer,
       sourceExcerpt: source,
     });
   }
 
-  return fallbackQuestions;
+  return sanitizeQuestions(fallbackQuestions);
 }
 
 // ---- nodes ---------------------------------------------------------------
@@ -115,7 +146,7 @@ async function generateQuestionsNode(state) {
     "Mix question types: roughly 60% \"mcq\" (4 options) and 40% \"short_answer\".",
     "",
     "Transcript:",
-    state.transcriptContext.slice(0, 12000),
+    (state.transcriptContext || "").slice(0, 12000),
     "",
     "Return ONLY a JSON array, no markdown fences, no commentary. Each item:",
     `{"questionText": "...", "type": "mcq" | "short_answer", "options": ["...","...","...","..."] (omit for short_answer), "correctAnswer": "...", "sourceExcerpt": "short quote or close paraphrase from the transcript this is based on"}`,
@@ -123,7 +154,10 @@ async function generateQuestionsNode(state) {
 
   try {
     const res = await llm.invoke(prompt);
-    const questions = safeParseJsonArray(res.content.toString()) || [];
+    const questions = safeParseJsonArray(res.content) || [];
+    if (questions.length === 0) {
+      throw new Error("Parsed empty question set from LLM");
+    }
     return { questions, usedFallback: false };
   } catch (error) {
     if (isQuotaError(error) || /No Gemini API key configured/i.test(error?.message || "")) {
@@ -142,11 +176,11 @@ async function generateQuestionsNode(state) {
 }
 
 async function selfCritiqueNode(state) {
-  if (state.questions.length === 0) {
+  if (!state.questions || state.questions.length === 0) {
     return { critiqueVerdict: "no", critiqueFeedback: "No valid questions were produced." };
   }
 
-  if (state.questions.every((question) => question.type === "short_answer" && !question.options)) {
+  if (state.questions.every((question) => question.type === "short_answer" && (!question.options || question.options.length === 0))) {
     return { critiqueVerdict: "yes", critiqueFeedback: "Fallback quiz generated successfully.", usedFallback: state.usedFallback };
   }
 
@@ -172,14 +206,18 @@ async function selfCritiqueNode(state) {
     "Reply with ONLY that JSON object.",
   ].join("\n");
 
-  const res = await llm.invoke(prompt);
   let verdict = "no";
   let feedback = "Could not parse critique; regenerating to be safe.";
 
   try {
-    const parsed = JSON.parse(res.content.toString().replace(/```json|```/g, "").trim());
-    verdict = parsed.verdict === "yes" ? "yes" : "no";
-    feedback = parsed.feedback || "";
+    const res = await llm.invoke(prompt);
+    const text = extractText(res.content);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      verdict = parsed.verdict === "yes" ? "yes" : "no";
+      feedback = parsed.feedback || "";
+    }
   } catch {
     // keep defaults above — forces a retry rather than shipping unchecked output
   }
@@ -195,7 +233,7 @@ async function regenerateNode(state) {
     JSON.stringify(state.questions, null, 2),
     "",
     "Transcript (ground every question in this, nothing else):",
-    state.transcriptContext.slice(0, 12000),
+    (state.transcriptContext || "").slice(0, 12000),
     "",
     `Fix the issues and return a corrected JSON array of exactly ${state.numQuestions} questions,`,
     "same schema as before. Return ONLY the JSON array.",
@@ -203,7 +241,7 @@ async function regenerateNode(state) {
 
   try {
     const res = await llm.invoke(prompt);
-    const questions = safeParseJsonArray(res.content.toString()) || state.questions;
+    const questions = safeParseJsonArray(res.content) || state.questions;
     return { questions, retryCount: state.retryCount + 1, usedFallback: false };
   } catch (error) {
     if (isQuotaError(error) || /No Gemini API key configured/i.test(error?.message || "")) {
@@ -254,8 +292,8 @@ export async function generateQuizQuestions({ lectureTitle, transcriptContext, n
   });
 
   return {
-    questions: result.questions,
-    retriesUsed: result.retryCount,
+    questions: sanitizeQuestions(result.questions),
+    retriesUsed: result.retryCount || 0,
     passedCritique: result.critiqueVerdict === "yes",
     usedFallback: result.usedFallback === true,
   };

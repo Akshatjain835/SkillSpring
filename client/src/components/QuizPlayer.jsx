@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { useGetQuizQuery, useSubmitQuizAttemptMutation } from "@/features/api/quizApi";
 import { CheckCircle2, HelpCircle, Loader2, XCircle } from "lucide-react";
+import { toast } from "sonner";
 
 const QuizPlayer = ({ courseId, lectureId }) => {
   const { data, isLoading, isError, refetch } = useGetQuizQuery(
@@ -33,7 +34,7 @@ const QuizPlayer = ({ courseId, lectureId }) => {
     );
   }
 
-  if (isError) {
+  if (isError || !data?.questions) {
     return (
       <Card className="mt-4">
         <CardContent className="p-4 text-sm text-muted-foreground flex items-center gap-2">
@@ -49,7 +50,7 @@ const QuizPlayer = ({ courseId, lectureId }) => {
   };
 
   const handleSubmit = async () => {
-    const answers = data.questions.map((q) => ({
+    const answers = (data.questions || []).map((q) => ({
       questionIndex: q.index,
       studentAnswer: responses[q.index] || "",
     }));
@@ -57,8 +58,8 @@ const QuizPlayer = ({ courseId, lectureId }) => {
     try {
       const res = await submitQuizAttempt({ courseId, lectureId, answers }).unwrap();
       setResult(res);
-    } catch {
-      // errors surface via isSubmitting/result staying null; keep it simple here
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to submit quiz attempt. Please try again.");
     }
   };
 
@@ -78,7 +79,7 @@ const QuizPlayer = ({ courseId, lectureId }) => {
           )}
         </div>
 
-        {data.questions.map((q) => {
+        {(data.questions || []).map((q) => {
           const graded = scoreByIndex.get(q.index);
           return (
             <div key={q.index} className="space-y-2 pb-4 border-b last:border-b-0">
@@ -88,7 +89,7 @@ const QuizPlayer = ({ courseId, lectureId }) => {
 
               {q.type === "mcq" ? (
                 <div className="space-y-1">
-                  {q.options.map((opt) => (
+                  {(q.options || []).map((opt) => (
                     <label
                       key={opt}
                       className="flex items-center gap-2 text-sm cursor-pointer"

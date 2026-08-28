@@ -142,15 +142,26 @@ export const updateProfile = async (req, res) => {
         message: "User not found",
       });
     }
-    if (user.photoUrl) {
-      const publicId = user.photoUrl.split("/").pop().split(".")[0];
-      deleteMediaFromCloudinary(publicId);
+
+    const updatedData = {};
+    if (name) updatedData.name = name;
+
+    if (profilePhoto) {
+      if (user.photoUrl) {
+        const publicId = user.photoUrl.split("/").pop().split(".")[0];
+        await deleteMediaFromCloudinary(publicId);
+      }
+
+      const cloudResponse = await uploadMedia(profilePhoto.path);
+      updatedData.photoUrl = cloudResponse.secure_url;
     }
 
-    const cloudResponse = await uploadMedia(profilePhoto.path);
-    const photoUrl = cloudResponse.secure_url;
-
-    const updatedData = { name, photoUrl };
+    if (Object.keys(updatedData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No profile changes were provided.",
+      });
+    }
     const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {
       new: true,
     }).select("-password");

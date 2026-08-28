@@ -34,18 +34,21 @@ function Profile() {
       isSuccess,
     },
   ] = useUpdateUserMutation();
-  const enrolledCourses = [1];
-  // console.log(data);
+  const user = data?.user;
+  const enrolledCourses = user?.enrolledCourses || [];
 
   const onChangeHanlder = (e) => {
     const file = e.target.files?.[0];
     if (file) setProfilePhoto(file);
   };
   const updateUserHandler = async () => {
-    // console.log(name,profilePhoto,email);
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("profilePhoto", profilePhoto);
+    formData.append("name", name || user?.name || "");
+
+    if (profilePhoto) {
+      formData.append("profilePhoto", profilePhoto);
+    }
+
     await updateUser(formData);
   };
 
@@ -56,16 +59,15 @@ function Profile() {
   useEffect(() => {
     if (isSuccess) {
       refetch();
-      toast.success(data.message || "Profile Updated.");
+      toast.success(updateUserData?.message || "Profile Updated.");
     }
     if (isError) {
-      toast.success(error.message || "Failed to Update Profile.");
+      toast.error(error?.data?.message || "Failed to Update Profile.");
     }
-  }, [error, isError, updateUserData, isSuccess]);
+  }, [error, isError, updateUserData, isSuccess, refetch]);
 
   if (isLoading) return <h1>Profile Loading...</h1>;
 
-  const user = data && data.user;
   return (
     <div className="max-w-4xl mx-auto my-10">
       <h1 className="font-bold text-2xl text-center md:text-left">PROFILE</h1>
@@ -100,7 +102,7 @@ function Profile() {
             <h1 className="font-semibold text-xl text-gray-900 dark:text-gray-100">
               Role:
               <span className="font-normal text-gray-700 dark:text-gray-300 ml-2">
-                {user?.role.toUpperCase()}
+                {user?.role?.toUpperCase() || ""}
               </span>
             </h1>
           </div>
@@ -162,10 +164,10 @@ function Profile() {
       <div>
         <h1 className="font-medium text-lg">Courses you're enrolled</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
-          {user?.enrolledCourses.length === 0 ? (
+          {enrolledCourses.length === 0 ? (
             <h1>You haven't enrolled yet</h1>
           ) : (
-            user?.enrolledCourses.map((course) => (
+            enrolledCourses.map((course) => (
               <Course course={course} key={course._id} />
             ))
           )}

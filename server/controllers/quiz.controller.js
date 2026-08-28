@@ -35,6 +35,9 @@ export const generateQuiz = async (req, res) => {
 
     const lecture = await Lecture.findById(lectureId);
     if (!lecture) return res.status(404).json({ message: "Lecture not found." });
+    if (lecture.courseId && lecture.courseId.toString() !== courseId) {
+      return res.status(400).json({ message: "Lecture does not belong to this course." });
+    }
 
     const chunks = await TranscriptChunk.find({ lectureId }).sort({ chunkIndex: 1 }).lean();
     if (chunks.length === 0) {
@@ -77,8 +80,7 @@ export const generateQuiz = async (req, res) => {
   } catch (error) {
     console.error("generateQuiz error:", error?.message || error);
     return res.status(500).json({
-      message:
-        error?.message || "Failed to generate quiz.",
+      message: error?.message || "Failed to generate quiz.",
     });
   }
 };
@@ -107,7 +109,7 @@ export const getQuiz = async (req, res) => {
       index: i,
       questionText: q.questionText,
       type: q.type,
-      options: q.options,
+      options: q.options || [],
     }));
 
     return res.status(200).json({
@@ -150,41 +152,57 @@ export const submitQuizAttempt = async (req, res) => {
       const question = quiz.questions[submitted.questionIndex];
       if (!question) continue;
 
+      const studentStr = (submitted.studentAnswer || "").toString().trim();
+      const modelStr = (question.correctAnswer || "").toString().trim();
+
       if (question.type === "mcq") {
-        const isCorrect =
-          (submitted.studentAnswer || "").trim().toLowerCase() ===
-          question.correctAnswer.trim().toLowerCase();
+        const isCorrect = studentStr.toLowerCase() === modelStr.toLowerCase();
 
         gradedAnswers.push({
           questionIndex: submitted.questionIndex,
-          studentAnswer: submitted.studentAnswer || "",
+          studentAnswer: studentStr,
           score: isCorrect ? 1 : 0,
           feedback: isCorrect
             ? "Correct."
-            : `Not quite — the correct answer is "${question.correctAnswer}".`,
-          correctAnswer: question.correctAnswer,
+            : `Not quite — the correct answer is "${modelStr}".`,
+          correctAnswer: modelStr,
         });
       } else {
         // short_answer — this is where the grading LangGraph runs
-        const { score, feedback } = await gradeShortAnswer({
-          questionText: question.questionText,
-          correctAnswer: question.correctAnswer,
-          studentAnswer: submitted.studentAnswer || "",
-          sourceExcerpt: question.sourceExcerpt,
-        });
+        try {
+          const { score, feedback } = await gradeShortAnswer({
+            questionText: question.questionText,
+            correctAnswer: modelStr,
+            studentAnswer: studentStr,
+            sourceExcerpt: question.sourceExcerpt,
+          });
 
-        gradedAnswers.push({
-          questionIndex: submitted.questionIndex,
-          studentAnswer: submitted.studentAnswer || "",
-          score,
-          feedback,
-          correctAnswer: question.correctAnswer,
-        });
+          gradedAnswers.push({
+            questionIndex: submitted.questionIndex,
+            studentAnswer: studentStr,
+            score,
+            feedback,
+            correctAnswer: modelStr,
+          });
+        } catch {
+          const isExact = studentStr.toLowerCase() === modelStr.toLowerCase();
+          gradedAnswers.push({
+            questionIndex: submitted.questionIndex,
+            studentAnswer: studentStr,
+            score: isExact ? 1 : 0,
+            feedback: isExact
+              ? "Correct answer."
+              : `Completed attempt. Model answer: "${modelStr}".`,
+            correctAnswer: modelStr,
+          });
+        }
       }
     }
 
     const totalScore =
-      gradedAnswers.reduce((sum, a) => sum + a.score, 0) / gradedAnswers.length;
+      gradedAnswers.length > 0
+        ? gradedAnswers.reduce((sum, a) => sum + a.score, 0) / gradedAnswers.length
+        : 0;
 
     const attempt = await QuizAttempt.create({
       quizId: quiz._id,

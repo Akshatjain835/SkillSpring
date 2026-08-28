@@ -23,9 +23,6 @@ const MEDIA_API = `${import.meta.env.VITE_API_URL}/api/v1/media`;
 const LectureTab = () => {
   const [lectureTitle, setLectureTitle] = useState("");
   const [isFree, setIsFree] = useState(false);
-
-  const [btnDisable, setBtnDisable] = useState(true);
-
   const [uploadVideoInfo, setUploadVideoInfo] = useState(null);
   const [mediaProgress, setMediaProgress] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);

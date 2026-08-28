@@ -29,7 +29,7 @@ const transcriptChunkSchema = new mongoose.Schema(
     // Google text-embedding-004 returns 768-dim vectors
     embedding: {
       type: [Number],
-      required: true,
+      default: [],
     },
   },
   { timestamps: true }

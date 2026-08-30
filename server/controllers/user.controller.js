@@ -133,7 +133,7 @@ export const getUserProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.id;
-    const { name } = req.body;
+    const { name, headline, bio, githubUrl, linkedinUrl, websiteUrl } = req.body;
     const profilePhoto = req.file;
     const user = await User.findById(userId);
     if (!user) {
@@ -144,7 +144,12 @@ export const updateProfile = async (req, res) => {
     }
 
     const updatedData = {};
-    if (name) updatedData.name = name;
+    if (name !== undefined) updatedData.name = name;
+    if (headline !== undefined) updatedData.headline = headline;
+    if (bio !== undefined) updatedData.bio = bio;
+    if (githubUrl !== undefined) updatedData.githubUrl = githubUrl;
+    if (linkedinUrl !== undefined) updatedData.linkedinUrl = linkedinUrl;
+    if (websiteUrl !== undefined) updatedData.websiteUrl = websiteUrl;
 
     if (profilePhoto) {
       if (user.photoUrl) {
@@ -162,6 +167,7 @@ export const updateProfile = async (req, res) => {
         message: "No profile changes were provided.",
       });
     }
+
     const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {
       new: true,
     }).select("-password");
@@ -179,3 +185,4 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
+

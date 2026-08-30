@@ -30,8 +30,29 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    headline: {
+      type: String,
+      default: "",
+    },
+    bio: {
+      type: String,
+      default: "",
+    },
+    githubUrl: {
+      type: String,
+      default: "",
+    },
+    linkedinUrl: {
+      type: String,
+      default: "",
+    },
+    websiteUrl: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );
 
 export const User = mongoose.model("User", userSchema);
+

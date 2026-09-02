@@ -55,11 +55,7 @@ export const appRoutes = [
       },
       {
         path: "course/search",
-        element: (
-          <ProtectedRoute>
-            <SearchPage />
-          </ProtectedRoute>
-        ),
+        element: <SearchPage />,
       },
       {
         path: "course-detail/:courseId",

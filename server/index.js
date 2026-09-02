@@ -24,20 +24,31 @@ const PORT = process.env.PORT || 5000 ;
 //default middleware
 app.use(express.json())
 app.use(cookieParser());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 app.use(
-    cors({
-      origin: "http://localhost:5173",
-      methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
-      allowedHeaders: [
-        "Content-Type",
-        "Authorization",
-        "Cache-Control",
-        "Expires",
-        "Pragma",
-      ],
-      credentials: true,
-    })
-  );
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production") {
+        return callback(null, true);
+      }
+      return callback(null, origin);
+    },
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Cache-Control",
+      "Expires",
+      "Pragma",
+    ],
+    credentials: true,
+  })
+);
 
 connectDB();
 

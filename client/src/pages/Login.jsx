@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("Login");
   const [registerUser, { isLoading: registerIsLoading }] = useRegisterUserMutation();
   const [loginUser, { isLoading: loginIsLoading }] = useLoginUserMutation();
 
@@ -56,7 +57,9 @@ const Login = () => {
       toast.success(response.message || `${type === "signup" ? "Account created" : "Welcome back"}!`);
 
       if (type === "signup") {
-        navigate("/");
+        setLoginInput((prev) => ({ ...prev, email: signupInput.email }));
+        setSignupInput({ name: "", email: "", password: "" });
+        setActiveTab("Login");
       } else {
         navigate("/");
       }
@@ -83,7 +86,7 @@ const Login = () => {
 
         {/* Form Container Card */}
         <Card className="rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden bg-white dark:bg-slate-900">
-          <Tabs defaultValue="Login" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="px-6 pt-6">
               <TabsList className="grid grid-cols-2 w-full p-1 bg-slate-100 dark:bg-slate-800/60 rounded-2xl">
                 <TabsTrigger value="Login" className="rounded-xl text-xs font-bold">

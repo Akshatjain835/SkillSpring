@@ -7,6 +7,13 @@ export const tutorApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: TUTOR_API,
     credentials: "include",
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   endpoints: (builder) => ({
     askTutor: builder.mutation({

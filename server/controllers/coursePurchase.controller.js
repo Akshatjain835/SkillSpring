@@ -186,21 +186,38 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
   }
 };
 
-export const getAllPurchasedCourse = async (_, res) => {
+export const getAllPurchasedCourse = async (req, res) => {
   try {
-    const purchasedCourse = await CoursePurchase.find({
-      status: "completed",
-    }).populate("courseId");
-    if (!purchasedCourse) {
-      return res.status(404).json({
-        purchasedCourse: [],
-      });
+    const userId = req.id;
+
+    // Fetch courses created by this instructor
+    const instructorCourses = await Course.find({ creator: userId }).lean();
+    const instructorCourseIds = instructorCourses.map((c) => c._id);
+
+    // If instructor has specific courses, filter purchases for those courses
+    let filter = { status: "completed" };
+    if (instructorCourseIds.length > 0) {
+      filter.courseId = { $in: instructorCourseIds };
     }
+
+    const purchasedCourse = await CoursePurchase.find(filter)
+      .populate({
+        path: "courseId",
+        select: "courseTitle coursePrice category isPublished creator enrolledStudents courseThumbnail",
+      })
+      .populate("userId", "name email photoUrl")
+      .sort({ createdAt: -1 })
+      .lean();
+
     return res.status(200).json({
-      purchasedCourse,
+      purchasedCourse: purchasedCourse || [],
+      courses: instructorCourses || [],
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error in getAllPurchasedCourse:", error);
+    return res.status(500).json({
+      message: "Failed to fetch purchased courses",
+    });
   }
 };
 

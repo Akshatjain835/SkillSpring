@@ -6,15 +6,15 @@ const apiKey = process.env.GOOGLE_API_KEY ?? process.env.GEMINI_API_KEY;
 
 const llm = apiKey
   ? new ChatGoogleGenerativeAI({
-      apiKey,
-      model: "gemini-2.0-flash",
-      temperature: 0.4, // a little variety helps question diversity
-    })
+    apiKey,
+    model: "gemini-3.6-flash",
+    temperature: 0.4, // a little variety helps question diversity
+  })
   : {
-      async invoke() {
-        throw new Error("No Gemini API key configured.");
-      },
-    };
+    async invoke() {
+      throw new Error("No Gemini API key configured.");
+    },
+  };
 
 const MAX_RETRIES = 2;
 

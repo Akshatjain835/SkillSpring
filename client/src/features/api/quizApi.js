@@ -7,6 +7,13 @@ export const quizApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: QUIZ_API,
     credentials: "include",
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   tagTypes: ["Quiz"],
   endpoints: (builder) => ({

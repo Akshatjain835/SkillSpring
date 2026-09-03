@@ -8,6 +8,13 @@ export const lectureApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: LECTURE_API,
     credentials: "include",
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   endpoints: (builder) => ({
     createLecture: builder.mutation({

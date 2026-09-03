@@ -7,7 +7,7 @@ function getLlm() {
   if (!apiKey) return null;
   return new ChatGoogleGenerativeAI({
     apiKey,
-    model: "gemini-2.0-flash",
+    model: "gemini-3.6-flash",
     temperature: 0,
   });
 }
